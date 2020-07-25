@@ -14,7 +14,9 @@ export const useAnimatedScale = (scGap, delay) => {
                     currScale += scGap
                     setScale(currScale)
                     if (currScale > 1) {
-                        setScale(currScale)
+                        setScale(0)
+                        setAnimated(false)
+                        clearInterval(interval)
                     }
                 }, delay)
             }
@@ -36,6 +38,10 @@ export const useDimension = () => {
             }
         }
     })
+    return {
+        w,
+        h
+    }
 }
 
 export const useStyle = (w, h, scale) => {
@@ -43,14 +49,24 @@ export const useStyle = (w, h, scale) => {
     const size = Math.min(w, h) / 10
     const background = '#4CAF50'
     const position = 'absolute'
-    const y = `${(h / 2 - size) * (1 - sf)}px`
-    const sf1 = sinify(divideScale(sf, 0, 3))
-    const sf2 = sinify(divideScale(sf, 1, 3))
-    const sf3 = sinify(divideScale(sf, 2, 3))
+
+    const sf1 = divideScale(sf, 0, 3)
+    const sf2 = divideScale(sf, 1, 3)
+    const sf3 = divideScale(sf, 2, 3)
+
+    const sf01 = sinify(divideScale(sf1, 0, 2))
+    const sf02 = sinify(divideScale(sf2, 0, 2))
+    const sf03 = sinify(divideScale(sf3, 0, 2))
+
+    const sf11 = divideScale(sf1, 1, 2)
+    const sf12 = divideScale(sf2, 1, 2)
+    const sf13 = divideScale(sf3, 1, 2)
+
+    const y = h - size - ((h - size) / 3) * (sf11 + sf12 + sf13)
     const dx = (w / 2 - size)
     return {
         getBlockStyle(i) {
-            const x = (w / 2 - size) + size * i + dx * (sf1 + sf2 + sf3)
+            const x = (w / 2 - size) + size * i + dx * (sf01 + sf02 + sf03) * (1 - 2 * i)
             const left = `${x}px`
             const top = `${y}px`
             const width = `${size}px`
